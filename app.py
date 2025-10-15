@@ -547,20 +547,7 @@ class ComfyRunner:
         logger.info("="*80)
         logger.info(f"🚀 Starting ComfyUI server with client_id: {self.client_id}")
         logger.info("="*80)
-       """ 
-        # Create symlink from /mnt/input to ComfyUI input directory
-        try:
-            # Ensure ComfyUI input directory exists
-            self.COMFYUI_INPUT_DIR.mkdir(parents=True, exist_ok=True)
-            
-            # Create symlink for each file in /mnt/input to ComfyUI input
-            # This allows ComfyUI to see files from our volume
-            logger.info(f"📁 Setting up input directory: {self.INPUT_DIR}")
-            self.INPUT_DIR.mkdir(parents=True, exist_ok=True)
-            
-        except Exception as e:
-            logger.warning(f"⚠️ Input directory setup warning: {e}")
-        """
+       
         # Start ComfyUI server with proper error handling
         try:
             self.proc = subprocess.Popen(
