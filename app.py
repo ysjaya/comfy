@@ -231,7 +231,7 @@ class BaseWorkflowRequest(BaseModel):
         return v
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "prompt": "A beautiful cinematic shot of a sunset over the ocean",
                 "negative_prompt": "worst quality, low quality",
@@ -290,12 +290,11 @@ class VideoResponse(BaseModel):
     error: Optional[str] = None
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
-                "status": "completed",
-                "video_b64": "base64_encoded_video_data...",
-                "prompt_id": "abc-123-def",
-                "processing_time": 45.2
+                "prompt": "A beautiful cinematic shot of a sunset over the ocean",
+                "negative_prompt": "worst quality, low quality",
+                "seed": 42
             }
         }
 
@@ -548,7 +547,7 @@ class ComfyRunner:
         logger.info("="*80)
         logger.info(f"🚀 Starting ComfyUI server with client_id: {self.client_id}")
         logger.info("="*80)
-        
+       """ 
         # Create symlink from /mnt/input to ComfyUI input directory
         try:
             # Ensure ComfyUI input directory exists
@@ -561,7 +560,7 @@ class ComfyRunner:
             
         except Exception as e:
             logger.warning(f"⚠️ Input directory setup warning: {e}")
-        
+        """
         # Start ComfyUI server with proper error handling
         try:
             self.proc = subprocess.Popen(
@@ -611,29 +610,27 @@ class ComfyRunner:
         
         raise RuntimeError(f"ComfyUI server failed to respond within {SERVER_STARTUP_TIMEOUT} seconds")
     
+# app.py: Ganti dengan versi yang lebih simpel
+
     def _save_file(self, b64_data: str, extension: str) -> str:
-        """Save base64 data to input directory and copy to ComfyUI"""
+        """Save base64 data to input directory"""
         try:
             data = base64.b64decode(b64_data)
             filename = f"input_{uuid.uuid4()}.{extension}"
             
-            # Save to our volume mount
+            # Save file once to the mounted volume directory
             filepath = self.INPUT_DIR / filename
             with open(filepath, "wb") as f:
                 f.write(data)
             
-            # Copy to ComfyUI input directory so it can be accessed
-            comfyui_filepath = self.COMFYUI_INPUT_DIR / filename
-            with open(comfyui_filepath, "wb") as f:
-                f.write(data)
-            
-            logger.info(f"Saved file: {filename} ({len(data)/1024:.2f} KB) to both directories")
+            logger.info(f"Saved file: {filename} ({len(data)/1024:.2f} KB)")
             return filename
             
         except Exception as e:
             logger.error(f"Failed to save file: {e}")
-            raise ValueError(f"Invalid base64 data: {e}")
-    
+            raise ValueError(f"Invalid base64 data: {e}") 
+        
+
     def _queue_workflow(self, workflow: Dict[str, Any]) -> str:
         """Submit workflow to ComfyUI"""
         try:
